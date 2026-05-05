@@ -216,8 +216,8 @@ input:checked+.toggle-slider:before{transform:translateX(24px)}
 .hp-screen{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--tmc-cream)}
 .hp-header{background:linear-gradient(160deg,var(--tmc-navy) 0%,#1e3250 100%);padding:48px 20px 28px;position:relative;overflow:hidden}
 .hp-header::before{content:'';position:absolute;top:-30%;right:-15%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(46,196,182,.12) 0%,transparent 70%)}
-.hp-logo{font-family:var(--font-display);font-size:14px;font-weight:600;color:rgba(255,255,255,.6);letter-spacing:-.2px;margin-bottom:14px;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
-.hp-logo span{color:var(--tmc-teal)}
+.hp-logo{margin-bottom:14px;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+.hp-logo img{height:52px;width:auto;display:block;}
 .hp-reset-link{font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;background:none;border:none;font-family:var(--font-body);text-decoration:underline;padding:0}
 .hp-reset-link:hover{color:rgba(255,255,255,.7)}
 .hp-greeting{font-family:var(--font-display);font-size:28px;font-weight:600;color:white;line-height:1.2;position:relative;z-index:1}
@@ -238,7 +238,7 @@ input:checked+.toggle-slider:before{transform:translateX(24px)}
 .uv-spf-rec strong{color:var(--tmc-teal-dark)}
 .uv-spf-note{font-size:11px;color:var(--tmc-gray-600);font-style:italic;margin-top:4px}
 .uv-peak-alert{background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;color:#f57f17;font-weight:500;margin-bottom:10px;display:none}
-.uv-weather-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tmc-gray-600);padding-top:8px;border-top:1px solid var(--tmc-gray-100)}
+.uv-weather-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;color:var(--tmc-gray-600);padding-top:8px;border-top:1px solid var(--tmc-gray-100)}
 .uv-loading-state{text-align:center;padding:24px 0}
 .uv-loading-spinner{width:28px;height:28px;border:3px solid var(--tmc-gray-200);border-top-color:var(--tmc-teal);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px}
 .uv-unavailable{text-align:center;padding:20px 0;color:var(--tmc-gray-400);font-size:13px}
@@ -744,7 +744,7 @@ function renderHeader(showBack=true){
   const microMsg=['Great start — just a few more questions',"You’re halfway there",'Your profile is taking shape','Nearly done — almost ready'][Math.floor(getProgress()/26)%4]||'';
   return`<div class="header">
     ${showBack?'<button class="header-back" onclick="goBack()">&#8592;</button>':'<div></div>'}
-    <div class="header-logo">The Mole <span>Clinic</span></div><div style="width:36px"></div>
+    <div class="header-logo"><img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" style="height:44px;width:auto;"></div><div style="width:36px"></div>
   </div>
   <div class="progress-bar"><div class="progress-fill" style="width:${getProgress()}%"></div></div>
   <div class="progress-label">${getProgressLabel()}</div>
@@ -1110,13 +1110,14 @@ function buildUVCardHtml(wd,p,hour){
   const isPeak=hour>=11&&hour<=15;
   if(wd&&wd.uv!=null){
     const band=getUVBand(wd.uv),spf=getPersonalisedSPF(wd.uv,p.skinType),showPeak=isPeak&&wd.uv>=3;
+    const spfAction=spf.spf?(spf.msg.replace(/^SPF [^,]+,\s*/,'')||spf.msg).replace(/^./,c=>c.toUpperCase()):'';
     return`<div id="hp-uv-loading" style="display:none"></div><div id="hp-uv-data">
       <div class="uv-gauge-wrap" id="hp-uv-gauge">${renderUVGaugeSVG(wd.uv)}</div>
       <div class="uv-value-row"><div class="uv-value" id="hp-uv-value">${Math.round(wd.uv)}</div><div class="uv-value-label">UV Index</div></div>
       <div class="uv-level-badge" id="hp-uv-level" style="background:${band.bg};color:${band.text}">${band.level}</div>
-      <div class="uv-spf-rec" id="hp-spf-msg">${spf.spf?`Based on your skin profile, we recommend <strong>SPF ${spf.spf}</strong> today<br><span style="font-size:12px">${spf.msg}</span>`:'No sun protection required at current UV levels.'}${spf.note?`<div class="uv-spf-note">${spf.note}</div>`:''}</div>
+      <div class="uv-spf-rec" id="hp-spf-msg">${spf.spf?`Based on your current location, the current weather and your skin profile, we recommend <strong>SPF ${spf.spf}</strong> today. ${spfAction}.`:'No sun protection required at current UV levels.'}${spf.note?`<div class="uv-spf-note">${spf.note}</div>`:''}</div>
       <div class="uv-peak-alert" id="hp-peak-uv" style="display:${showPeak?'block':'none'}">&#9728;&#65039; You are in the peak UV window right now (11:00–15:00)</div>
-      <div class="uv-weather-row" id="hp-weather-summary"><span>${getWeatherEmoji(wd.weatherCode)}</span><span>${Math.round(wd.temp)}°C · ${getWeatherDesc(wd.weatherCode)}</span></div>
+      <div class="uv-weather-row" id="hp-weather-summary"><span style="font-size:20px">${getWeatherEmoji(wd.weatherCode)}</span><span>${Math.round(wd.temp)}°C · ${getWeatherDesc(wd.weatherCode)}</span></div>
     </div>`;
   }
   if(!p.consentLocation){
@@ -1172,7 +1173,7 @@ function renderHomepage(){
   </svg>`;
   return`<div class="hp-screen">
     <div class="hp-header">
-      <div class="hp-logo">The Mole <span>Clinic</span><button class="hp-reset-link" onclick="resetProfile()">Reset profile</button></div>
+      <div class="hp-logo"><img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" style="height:52px;width:auto;display:block;"><button class="hp-reset-link" onclick="resetProfile()">Reset profile</button></div>
       <div class="hp-greeting">${getGreeting()}, ${p.name||'there'}</div>
       <div class="hp-meta">
         <div class="hp-date">${formatDateLong(new Date())}</div>
@@ -1204,7 +1205,6 @@ function renderHomepage(){
             </div>
             <div class="card" style="margin-bottom:12px">
               <div class="hp-profile-row"><span class="hp-profile-label">Skin tone</span><span class="hp-profile-value">${skinTone?`<span style="display:inline-block;width:18px;height:18px;border-radius:50%;background:${skinTone.color};border:1.5px solid rgba(0,0,0,.15)"></span> Monk Tone ${p.skinType} of 10`:'-'}</span></div>
-              <div class="hp-profile-row"><span class="hp-profile-label">Fitzpatrick</span><span class="hp-profile-value" style="font-size:12px">${fitzType}</span></div>
               <div class="hp-profile-row"><span class="hp-profile-label">Age range</span><span class="hp-profile-value">${questions[0].options.find(o=>o.value===p.answers.age)?.label||'—'}</span></div>
               <div class="hp-profile-row" style="border-bottom:none"><span class="hp-profile-label">Risk score</span><span class="hp-profile-value">${p.riskScore}/100</span></div>
             </div>
@@ -1282,11 +1282,11 @@ function updateWeatherUI(wd,geo){
   const lvlEl=document.getElementById('hp-uv-level');
   if(lvlEl){lvlEl.textContent=band.level;lvlEl.style.background=band.bg;lvlEl.style.color=band.text;lvlEl.style.display='block';}
   const spfEl=document.getElementById('hp-spf-msg');
-  if(spfEl){spfEl.style.display='block';spfEl.innerHTML=spf.spf?`Based on your skin profile, we recommend <strong>SPF ${spf.spf}</strong> today<br><span style="font-size:12px">${spf.msg}</span>`:'No sun protection required at current UV levels.';if(spf.note)spfEl.innerHTML+=`<div class="uv-spf-note">${spf.note}</div>`;}
+  if(spfEl){const spfAction=spf.spf?(spf.msg.replace(/^SPF [^,]+,\s*/,'')||spf.msg).replace(/^./,c=>c.toUpperCase()):'';spfEl.style.display='block';spfEl.innerHTML=spf.spf?`Based on your current location, the current weather and your skin profile, we recommend <strong>SPF ${spf.spf}</strong> today. ${spfAction}.`:'No sun protection required at current UV levels.';if(spf.note)spfEl.innerHTML+=`<div class="uv-spf-note">${spf.note}</div>`;}
   const peakEl=document.getElementById('hp-peak-uv');
-  if(peakEl)peakEl.style.display=showPeak?'block':'none';
+  if(peakEl){if(showPeak){peakEl.innerHTML='&#9728;&#65039; You are in the peak UV window right now (11:00–15:00)';peakEl.style.display='block';}else{peakEl.style.display='none';}}
   const wxEl=document.getElementById('hp-weather-summary');
-  if(wxEl){wxEl.style.display='flex';wxEl.innerHTML=`<span>${getWeatherEmoji(wd.weatherCode)}</span><span>${Math.round(wd.temp)}°C · ${getWeatherDesc(wd.weatherCode)}</span>`;}
+  if(wxEl){wxEl.style.display='flex';wxEl.innerHTML=`<span style="font-size:20px">${getWeatherEmoji(wd.weatherCode)}</span><span>${Math.round(wd.temp)}°C · ${getWeatherDesc(wd.weatherCode)}</span>`;}
   if(geo&&geo.city){
     st.currentCity=geo.city;
     const cityEl=document.getElementById('hp-city');if(cityEl)cityEl.textContent=geo.city;
@@ -1342,7 +1342,7 @@ async function initHomepageAsync(){
     if(coords){
       try{
         const wd=await fetchWeatherAndUV(coords.lat,coords.lon);
-        if(wd){updateWeatherUI(wd,{city:`Based on your postcode (${p.postcode.toUpperCase()})`});return;}
+        if(wd){updateWeatherUI(wd,{city:`Based on your current postcode (${p.postcode.toUpperCase()})`});return;}
       }catch(e){}
     }
     showPostcodeUVError(p);
@@ -1387,7 +1387,7 @@ async function retryPostcodeUV(){
   if(loadEl){loadEl.style.display='block';loadEl.className='uv-loading-state';loadEl.innerHTML=`<div class="uv-loading-spinner"></div><div style="font-size:13px;color:var(--tmc-gray-400)">Retrying…</div><div class="uv-spf-rec" style="margin-top:12px">${getDefaultSPFRec(p.skinType)}</div>`;}
   if(dataEl)dataEl.style.display='none';
   const coords=await fetchCoordinatesFromPostcode(p.postcode);
-  if(coords){try{const wd=await fetchWeatherAndUV(coords.lat,coords.lon);if(wd){updateWeatherUI(wd,{city:`Based on your postcode (${p.postcode.toUpperCase()})`});return;}}catch(e){}}
+  if(coords){try{const wd=await fetchWeatherAndUV(coords.lat,coords.lon);if(wd){updateWeatherUI(wd,{city:`Based on your current postcode (${p.postcode.toUpperCase()})`});return;}}catch(e){}}
   showPostcodeUVError(p);
 }
 function resetProfile(){if(confirm('This will clear your profile and restart the questionnaire. Are you sure?')){clearProfile();st.profile=null;st.screen='welcome';st.history=['welcome'];st.weatherData=null;st.currentCity='';render();}}
