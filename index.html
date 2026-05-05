@@ -43,10 +43,10 @@ body{padding-bottom:env(safe-area-inset-bottom)}
 .screen-slide-right{animation:slideInRight .35s cubic-bezier(.4,0,.2,1) forwards}
 .screen-slide-left{animation:slideInLeft .35s cubic-bezier(.4,0,.2,1) forwards}
 .screen{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-.header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:var(--tmc-white);border-bottom:1px solid var(--tmc-gray-200);position:sticky;top:0;z-index:100}
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 8px;background:var(--tmc-white);border-bottom:1px solid var(--tmc-gray-200);position:sticky;top:0;z-index:100}
 .header-logo{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--tmc-navy);letter-spacing:-.3px}
 .header-logo span{color:var(--tmc-teal)}
-.header-back{width:36px;height:36px;border-radius:50%;border:none;background:var(--tmc-gray-100);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:18px;color:var(--tmc-gray-600)}
+.header-back{width:44px;height:44px;border-radius:50%;border:none;background:var(--tmc-gray-100);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:18px;color:var(--tmc-gray-600)}
 .header-back:hover{background:var(--tmc-gray-200)}
 .progress-bar{height:3px;background:var(--tmc-gray-200)}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--tmc-teal),var(--tmc-teal-dark));transition:width .6s cubic-bezier(.4,0,.2,1);border-radius:0 2px 2px 0}
@@ -174,7 +174,7 @@ body{padding-bottom:env(safe-area-inset-bottom)}
 .tag-veryhigh{background:#f3e5f5;color:#6a1b9a}
 .welcome-hero{background:linear-gradient(160deg,var(--tmc-navy) 0%,#2a3f5a 50%,var(--tmc-navy-light) 100%);border-radius:0 0 var(--radius-xl) var(--radius-xl);padding:48px 24px 40px;text-align:center;color:white;position:relative;overflow:hidden}
 .welcome-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(46,196,182,.15) 0%,transparent 70%)}
-.welcome-hero-icon{width:72px;height:72px;background:rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;backdrop-filter:blur(10px);position:relative;z-index:1}
+.welcome-hero-logo{position:relative;z-index:1;margin:0 auto 24px auto}
 .welcome-hero .title-xl{color:white;position:relative;z-index:1}
 .welcome-hero .subtitle{color:rgba(255,255,255,.78);position:relative;z-index:1}
 .welcome-stat{display:inline-block;background:rgba(255,255,255,.12);border-radius:var(--radius-sm);padding:8px 14px;font-size:13px;color:rgba(255,255,255,.9);margin-top:16px;position:relative;z-index:1;backdrop-filter:blur(4px)}
@@ -217,7 +217,7 @@ input:checked+.toggle-slider:before{transform:translateX(24px)}
 .hp-header{background:linear-gradient(160deg,var(--tmc-navy) 0%,#1e3250 100%);padding:48px 20px 28px;position:relative;overflow:hidden}
 .hp-header::before{content:'';position:absolute;top:-30%;right:-15%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(46,196,182,.12) 0%,transparent 70%)}
 .hp-logo{margin-bottom:14px;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
-.hp-logo img{height:52px;width:auto;display:block;}
+.hp-logo img{height:60px;width:auto;display:block;}
 .hp-reset-link{font-size:11px;color:rgba(255,255,255,.4);cursor:pointer;background:none;border:none;font-family:var(--font-body);text-decoration:underline;padding:0}
 .hp-reset-link:hover{color:rgba(255,255,255,.7)}
 .hp-greeting{font-family:var(--font-display);font-size:28px;font-weight:600;color:white;line-height:1.2;position:relative;z-index:1}
@@ -291,6 +291,10 @@ input:checked+.toggle-slider:before{transform:translateX(24px)}
 .ref-item strong{color:var(--tmc-navy);display:block;font-size:13px;margin-bottom:2px}
 .hp-footer{text-align:center;padding:16px 0 8px;font-size:11px;color:var(--tmc-gray-400)}
 .hp-footer a{color:var(--tmc-gray-400);text-decoration:none}
+/* ===== DEV TOOLBAR ===== */
+.dev-toolbar{position:fixed;bottom:16px;left:16px;z-index:9999;background:rgba(0,0,0,.72);border-radius:20px;padding:5px 10px;display:flex;gap:6px;backdrop-filter:blur(4px)}
+.dev-toolbar button{background:none;border:none;color:rgba(255,255,255,.9);font-size:11px;font-family:var(--font-body);cursor:pointer;padding:4px 8px;border-radius:10px;transition:background .2s;white-space:nowrap}
+.dev-toolbar button:hover{background:rgba(255,255,255,.15)}
 /* ===== CONSENT SCREEN ICON ===== */
 .consent-icon{font-size:44px;text-align:center;margin-bottom:16px}
 .consent-info-box{background:var(--tmc-gray-100);border-radius:var(--radius-sm);padding:12px 14px;font-size:12px;color:var(--tmc-gray-600);line-height:1.5;margin-top:12px}
@@ -520,8 +524,8 @@ async function reverseGeocode(lat,lon){
   try{
     const res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,{headers:{'Accept-Language':'en','User-Agent':'TMCSkinCheckApp/0.2'}});
     const d=await res.json();
-    return{city:d.address.city||d.address.town||d.address.village||d.address.county||'',country:d.address.country||''};
-  }catch(e){return{city:'',country:''};}
+    return{city:d.address.city||d.address.town||d.address.village||d.address.county||'',country:d.address.country||'',country_code:d.address.country_code||''};
+  }catch(e){return{city:'',country:'',country_code:''};}
 }
 async function fetchCoordinatesFromPostcode(postcode){
   try{
@@ -539,20 +543,21 @@ async function getCurrentPosition(){
   });
 }
 // ===== TRAVEL DETECTION =====
-function logLocationEntry(lat,lon,country){
+function logLocationEntry(lat,lon,country,country_code){
   let h=getLocationHistory();
-  h.push({lat,lon,country,timestamp:Date.now()});
+  h.push({lat,lon,country,country_code:country_code||'',timestamp:Date.now()});
   if(h.length>90)h=h.slice(-90);
   saveLocationHistory(h);
 }
 function checkTravelStatus(profile){
   const h=getLocationHistory();
   if(h.length<3)return{isAway:false,justReturned:false};
-  const home=profile.homeCountry||'';
+  const home=profile.homeCountry||'gb';
+  const getCC=e=>e.country_code||e.country;
   const last3=h.slice(-3);
-  const allAway=last3.every(e=>e.country&&e.country!==home);
-  const currentCountry=h[h.length-1].country;
-  const currentlyHome=currentCountry===home;
+  const allAway=last3.every(e=>getCC(e)&&getCC(e)!==home);
+  const currentCC=getCC(h[h.length-1]);
+  const currentlyHome=currentCC===home;
   if(allAway)return{isAway:true,justReturned:false};
   if(profile.awayFromHome&&currentlyHome)return{isAway:false,justReturned:true};
   return{isAway:false,justReturned:false};
@@ -690,7 +695,7 @@ const st={
   skinType:null,answers:{},currentQuestion:0,abcdeAnswers:{},
   photoMode:null,fullBodyStep:0,fullBodyPhotos:[null,null,null,null,null,null],
   bodyPhotos:{},selectedRegion:null,
-  consentLocation:false,consentTravel:false,lat:null,lon:null,city:'',country:'',
+  consentLocation:false,consentTravel:false,lat:null,lon:null,city:'',country:'',country_code:'',
   riskScore:null,riskLevel:null,
   profile:null,weatherData:null,currentCity:'',showTravelBanner:false,profileExpanded:false,
 };
@@ -744,7 +749,7 @@ function renderHeader(showBack=true){
   const microMsg=['Great start — just a few more questions',"You’re halfway there",'Your profile is taking shape','Nearly done — almost ready'][Math.floor(getProgress()/26)%4]||'';
   return`<div class="header">
     ${showBack?'<button class="header-back" onclick="goBack()">&#8592;</button>':'<div></div>'}
-    <div class="header-logo"><img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" style="height:44px;width:auto;"></div><div style="width:36px"></div>
+    <div class="header-logo"><img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" style="height:32px;width:auto;"></div><div style="width:44px"></div>
   </div>
   <div class="progress-bar"><div class="progress-fill" style="width:${getProgress()}%"></div></div>
   <div class="progress-label">${getProgressLabel()}</div>
@@ -753,7 +758,7 @@ function renderHeader(showBack=true){
 function renderWelcome(){
   return`<div class="screen">
     <div class="welcome-hero animate-in">
-      <div class="welcome-hero-icon">&#128302;</div>
+      <img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" class="welcome-hero-logo" style="height:48px;width:auto;display:block;">
       <h1 class="title-xl">Free Skin<br>Health Check</h1>
       <p class="subtitle">Get your personalised Mole Clinic Profile in minutes. Know your risk. Know your next step.</p>
       <div class="welcome-stat animate-in-delay-1">&#128300; Over 16,000 people are diagnosed with melanoma in the UK each year.</div>
@@ -766,7 +771,7 @@ function renderWelcome(){
         <div class="feature-item animate-in-delay-3"><div class="feature-icon feature-icon-gold">&#128202;</div><div><div class="feature-title">Your Skin Safety Dashboard</div><div class="feature-desc">Personalised daily check-in: UV, risk summary, booking recommendations</div></div></div>
       </div>
       <div class="disclaimer animate-in-delay-4"><strong>Important:</strong> This is not a medical diagnosis. This tool helps you understand your skin cancer risk and recommends appropriate professional skin checks.</div>
-      <div class="trust-badge animate-in-delay-4">&#128274; Your data stays on your device — we never sell your details</div>
+      <div class="trust-badge animate-in-delay-4">Your data stays on your device — we never sell your details</div>
     </div>
     <div class="bottom-action"><button class="btn-primary" onclick="navigate('email')">Start Your Free Check &#8594;</button></div>
     ${renderFooter()}
@@ -782,7 +787,7 @@ function renderEmail(){
         <div class="input-group"><label class="input-label">First name</label><input class="input-field" type="text" id="nameInput" placeholder="Your first name" value="${st.name}" autocomplete="given-name"></div>
         <div class="input-group"><label class="input-label">Email address</label><input class="input-field" type="email" id="emailInput" placeholder="your@email.com" value="${st.email}" autocomplete="email"></div>
         <div class="input-group"><label class="input-label">Postcode</label><input class="input-field" type="text" id="postcodeInput" placeholder="e.g. M1 2AB" value="${st.postcode}" maxlength="8" style="text-transform:uppercase" autocomplete="postal-code"></div>
-        <p style="font-size:12px;color:var(--tmc-gray-600);margin-top:4px">&#128274; Your data is processed in accordance with GDPR. We'll never sell your details.</p>
+        <p style="font-size:12px;color:var(--tmc-gray-600);margin-top:4px">Your data is processed in accordance with GDPR. We'll never sell your details.</p>
       </div>
     </div>
     <div class="bottom-action"><button class="btn-primary" id="emailNext" disabled>Continue &#8594;</button></div>
@@ -1031,7 +1036,7 @@ function renderConsentLocation(){
           <label class="toggle-switch"><input type="checkbox" id="locationToggle" ${st.consentLocation?'checked':''}><span class="toggle-slider"></span></label>
         </div>
       </div>
-      <div class="consent-info-box">&#128274; Your location is processed entirely on this device and never transmitted to our servers or third parties. You can revoke this permission at any time in your browser settings.</div>
+      <div class="consent-info-box">Your location is processed entirely on this device and never transmitted to our servers or third parties. You can revoke this permission at any time in your browser settings.</div>
       ${st.consentLocation
         ?`<div class="consent-success-box"><span>&#10003;</span><span>Location access granted. We'll fetch live UV data for your area.</span></div>`
         :`<p style="margin-top:12px;font-size:13px;color:var(--tmc-gray-400);text-align:center">You can use the app without location — UV data will not be available.</p>`}
@@ -1053,7 +1058,7 @@ function renderConsentTravel(){
           <label class="toggle-switch"><input type="checkbox" id="travelToggle" ${st.consentTravel?'checked':''}><span class="toggle-slider"></span></label>
         </div>
       </div>
-      <div class="consent-info-box">&#128274; Location history (country-level) is stored only on this device. No data leaves your phone.</div>
+      <div class="consent-info-box">Location history (country-level) is stored only on this device. No data leaves your phone.</div>
     </div>
     <div class="bottom-action"><button class="btn-primary" onclick="navigate('consent_notifications')">Continue &#8594;</button></div>
     ${renderFooter()}
@@ -1078,7 +1083,7 @@ function renderConsentNotifications(){
   </div>`;
 }function renderLoading(){
   return`<div class="screen">
-    ${renderHeader(false)}
+    <div style="background:#2ec4b6;padding:14px 20px;text-align:center;position:sticky;top:0;z-index:100"><img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" style="height:36px;width:auto;"></div>
     <div class="loading-screen">
       <div class="loading-body-wrap">
         <svg class="loading-body-svg" viewBox="0 0 100 200" width="100" height="200" xmlns="http://www.w3.org/2000/svg">
@@ -1173,7 +1178,7 @@ function renderHomepage(){
   </svg>`;
   return`<div class="hp-screen">
     <div class="hp-header">
-      <div class="hp-logo"><img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" style="height:52px;width:auto;display:block;"><button class="hp-reset-link" onclick="resetProfile()">Reset profile</button></div>
+      <div class="hp-logo"><img src="https://themoleclinic.co.uk/wp-content/uploads/2025/02/MoleClinic-Ver-White2.png" alt="The Mole Clinic" style="height:60px;width:auto;display:block;"><button class="hp-reset-link" onclick="resetProfile()">Reset profile</button></div>
       <div class="hp-greeting">${getGreeting()}, ${p.name||'there'}</div>
       <div class="hp-meta">
         <div class="hp-date">${formatDateLong(new Date())}</div>
@@ -1182,11 +1187,11 @@ function renderHomepage(){
       </div>
     </div>
     ${st.showTravelBanner?`<div class="travel-banner animate-in" style="margin:16px 16px 0">
-      <div class="travel-banner-title">&#9992;&#65039; Welcome back from your travels!</div>
-      <div class="travel-banner-body">It looks like you've been abroad recently. Post-holiday is a clinically important time to book a full skin check — your skin may have had significant UV exposure.</div>
+      <div class="travel-banner-title">Just been away? &#9728;&#65039;</div>
+      <div class="travel-banner-body">Time to book your post-holiday skin check. Sun exposure abroad is one of the biggest risk factors for skin cancer.</div>
       <div class="travel-banner-actions">
-        <button class="travel-banner-book" onclick="window.open('https://www.themoleclinic.co.uk/book','_blank')">Book Now</button>
-        <button class="travel-banner-dismiss" onclick="dismissTravelBanner()">Dismiss</button>
+        <button class="travel-banner-book" onclick="window.open('https://www.themoleclinic.co.uk/book','_blank')">Book a Mole Check &#8594;</button>
+        <button class="travel-banner-dismiss" onclick="dismissTravelBanner()">Remind me later</button>
       </div></div>`:''}
     <div class="hp-content">
       <div class="hp-section-label">Today's Skin Safety</div>
@@ -1241,6 +1246,7 @@ function renderHomepage(){
       </div>
       <div class="hp-footer"><p>v0.2 &middot; <a href="https://themoleclinic.co.uk" target="_blank">The Mole Clinic</a></p></div>
     </div>
+    ${window.location.search.includes('dev=1')?`<div class="dev-toolbar"><button onclick="devSimulateHolidayReturn()">&#127757; Simulate holiday return</button><button onclick="devResetTravel()">&#128260; Reset travel data</button></div>`:''}
   </div>`;
 }
 // ===== TOGGLE HELPERS =====
@@ -1305,11 +1311,11 @@ async function initHomepageAsync(){
         const{latitude:lat,longitude:lon}=pos.coords;
         const geo=await reverseGeocode(lat,lon);
         // Save refreshed location to profile
-        const up={...st.profile,lat,lon,locationTimestamp:Date.now(),city:geo.city||st.profile.city,country:geo.country||st.profile.country,homeCountry:st.profile.homeCountry||geo.country};
+        const up={...st.profile,lat,lon,locationTimestamp:Date.now(),city:geo.city||st.profile.city,country:geo.country||st.profile.country,country_code:geo.country_code||st.profile.country_code,homeCountry:st.profile.homeCountry||(geo.country_code||geo.country)};
         saveProfile(up);st.profile=up;
         // Travel detection
         if(up.consentTravel&&geo.country){
-          logLocationEntry(lat,lon,geo.country);
+          logLocationEntry(lat,lon,geo.country,geo.country_code);
           const ts=checkTravelStatus(up);
           if(ts.justReturned&&shouldShowTravelBanner()){
             st.showTravelBanner=true;
@@ -1356,8 +1362,8 @@ function buildProfile(){
     consentLocation:st.consentLocation,consentTravel:st.consentTravel,
     skinType:st.skinType,answers:{...st.answers},abcdeAnswers:{...st.abcdeAnswers},
     riskScore:st.riskScore,riskLevel:st.riskLevel,
-    lat:st.lat,lon:st.lon,city:st.city,country:st.country,
-    homeCountry:st.country||'',locationTimestamp:st.lat?Date.now():null,
+    lat:st.lat,lon:st.lon,city:st.city,country:st.country,country_code:st.country_code,
+    homeCountry:st.country_code||(st.postcode?'gb':''),locationTimestamp:st.lat?Date.now():null,
     profileCreated:new Date().toISOString().split('T')[0],lastCheckDate:null,awayFromHome:false,
   };
 }
@@ -1471,7 +1477,7 @@ function bindEvents(){
         try{
           const pos=await getCurrentPosition();
           st.consentLocation=true;st.lat=pos.coords.latitude;st.lon=pos.coords.longitude;
-          const geo=await reverseGeocode(st.lat,st.lon);st.city=geo.city;st.country=geo.country;
+          const geo=await reverseGeocode(st.lat,st.lon);st.city=geo.city;st.country=geo.country;st.country_code=geo.country_code;
           render();
         }catch(e){locToggle.checked=false;st.consentLocation=false;showToast('Location permission denied');}
       }else{st.consentLocation=false;st.lat=null;st.lon=null;render();}
@@ -1480,6 +1486,34 @@ function bindEvents(){
   // Travel consent toggle
   const travToggle=document.getElementById('travelToggle');
   if(travToggle)travToggle.addEventListener('change',()=>{st.consentTravel=travToggle.checked;});
+}
+// ===== DEV TOOLS =====
+function devSimulateHolidayReturn(){
+  const p=st.profile;if(!p)return;
+  const now=Date.now();
+  let h=getLocationHistory();
+  for(let i=0;i<5;i++)h.push({lat:41.385064,lon:2.173403,country:'Spain',country_code:'es',timestamp:now-(6-i)*24*60*60*1000});
+  h.push({lat:51.46,lon:-0.306,country:'United Kingdom',country_code:'gb',timestamp:now});
+  if(h.length>90)h=h.slice(-90);
+  saveLocationHistory(h);
+  const up={...p,awayFromHome:true,homeCountry:p.homeCountry||'gb'};
+  saveProfile(up);st.profile=up;
+  const ts=checkTravelStatus(up);
+  if(ts.justReturned&&shouldShowTravelBanner()){
+    const up2={...up,awayFromHome:false};saveProfile(up2);st.profile=up2;
+    st.showTravelBanner=true;render();
+  }else{
+    showToast('Travel state: away='+ts.isAway+', returned='+ts.justReturned);
+  }
+}
+function devResetTravel(){
+  localStorage.removeItem('tmcLocationHistory');
+  localStorage.removeItem('tmcTravelBannerDismissed');
+  const p=st.profile;
+  if(p){const up={...p,awayFromHome:false};saveProfile(up);st.profile=up;}
+  st.showTravelBanner=false;
+  const b=document.querySelector('.travel-banner');if(b)b.remove();
+  showToast('Travel data reset');
 }
 // ===== INIT =====
 function init(){
