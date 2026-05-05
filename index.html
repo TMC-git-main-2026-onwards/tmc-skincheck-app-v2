@@ -228,7 +228,7 @@ input:checked+.toggle-slider:before{transform:translateX(24px)}
 .hp-section-label{font-size:11px;font-weight:700;color:var(--tmc-gray-400);text-transform:uppercase;letter-spacing:1.2px;margin:20px 0 10px}
 .hp-section-label:first-child{margin-top:0}
 /* ===== UV CARD ===== */
-.uv-card{background:var(--tmc-white);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-md);border:1px solid var(--tmc-gray-200);margin-bottom:4px}
+.uv-card{background:var(--tmc-white);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-md);border:1px solid var(--tmc-gray-200);margin-bottom:4px;overflow:visible}
 .uv-gauge-wrap{display:flex;justify-content:center;margin-bottom:8px}
 .uv-value-row{display:flex;align-items:baseline;justify-content:center;gap:8px;margin-bottom:6px}
 .uv-value{font-family:var(--font-display);font-size:40px;font-weight:700;color:var(--tmc-navy);line-height:1}
@@ -1123,7 +1123,14 @@ function buildUVCardHtml(wd,p,hour){
     const defSPF=getDefaultSPFRec(p.skinType);
     if(p.postcode){
       return`<div id="hp-uv-loading" class="uv-loading-state"><div class="uv-loading-spinner"></div><div style="font-size:13px;color:var(--tmc-gray-400)">Fetching UV data for your area…</div><div class="uv-spf-rec" style="margin-top:12px">${defSPF}</div></div>
-      <div id="hp-uv-data" style="display:none"></div>`;
+      <div id="hp-uv-data" style="display:none">
+        <div class="uv-gauge-wrap" id="hp-uv-gauge"></div>
+        <div class="uv-value-row"><div class="uv-value" id="hp-uv-value">—</div><div class="uv-value-label">UV Index</div></div>
+        <div class="uv-level-badge" id="hp-uv-level" style="display:none"></div>
+        <div class="uv-spf-rec" id="hp-spf-msg" style="display:none"></div>
+        <div id="hp-peak-uv" class="uv-peak-alert" style="display:none"></div>
+        <div id="hp-weather-summary" class="uv-weather-row" style="display:none"></div>
+      </div>`;
     }
     return`<div id="hp-uv-loading" style="display:none"></div><div id="hp-uv-data"><div class="uv-unavailable">
       <div class="uv-unavailable-icon">&#128205;</div><div style="font-size:14px;font-weight:600;color:var(--tmc-navy)">Location not enabled</div>
