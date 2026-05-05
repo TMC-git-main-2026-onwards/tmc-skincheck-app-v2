@@ -523,6 +523,15 @@ async function reverseGeocode(lat,lon){
     return{city:d.address.city||d.address.town||d.address.village||d.address.county||'',country:d.address.country||''};
   }catch(e){return{city:'',country:''};}
 }
+async function fetchCoordinatesFromPostcode(postcode){
+  try{
+    const pc=postcode.replace(/\s/g,'').toUpperCase();
+    const res=await fetch(`https://api.postcodes.io/postcodes/${pc}`);
+    const d=await res.json();
+    if(d.status===200&&d.result)return{lat:d.result.latitude,lon:d.result.longitude};
+    return null;
+  }catch(e){return null;}
+}
 async function getCurrentPosition(){
   return new Promise((resolve,reject)=>{
     if(!navigator.geolocation){reject(new Error('Geolocation not supported'));return;}
@@ -717,7 +726,7 @@ function getProgress(){
 }
 function getProgressLabel(){
   const labels={
-    welcome:'',email:'Step 1 of 6 — Your Details',consent:'Step 1 of 6 — Consent',
+    welcome:'',email:'Step 1 of 6 — Your Details',consent:'Step 1 of 6 — Privacy &amp; Consent',
     skintype:'Step 2 of 6 — Skin Type',questionnaire:`Step 3 of 6 — Question ${st.currentQuestion+1} of ${questions.length}`,
     bodymapselect:'Step 4 of 6 — Photo Capture',phototips:'Step 4 of 6 — Photo Tips',
     fullbodycapture:`Step 4 of 6 — Photo ${st.fullBodyStep+1} of ${fullBodySteps.length}`,
@@ -748,7 +757,7 @@ function renderWelcome(){
       <h1 class="title-xl">Free Skin<br>Health Check</h1>
       <p class="subtitle">Get your personalised Mole Clinic Profile in minutes. Know your risk. Know your next step.</p>
       <div class="welcome-stat animate-in-delay-1">&#128300; Over 16,000 people are diagnosed with melanoma in the UK each year.</div>
-      <div class="welcome-social-proof animate-in-delay-2">Join 5,000+ people who've used this free tool</div>
+      <div class="welcome-social-proof animate-in-delay-2">Used by patients across The Mole Clinic's UK clinics</div>
     </div>
     <div class="content">
       <div class="feature-list">
@@ -1005,7 +1014,7 @@ function renderABCDE(){
       </div>
       <div class="disclaimer" style="margin-top:16px"><strong>Don't worry</strong> — noticing these features doesn't mean you have skin cancer. It simply means a professional check is recommended.</div>
     </div>
-    <div class="bottom-action"><button class="btn-primary" onclick="finishOnboarding()">Build My Profile &#8594;</button></div>
+    <div class="bottom-action"><button class="btn-primary" onclick="navigate('consent_location')">Continue &#8594;</button></div>
     ${renderFooter()}
   </div>`;
 }
@@ -1055,8 +1064,8 @@ function renderConsentNotifications(){
     ${renderHeader()}
     <div class="content animate-in">
       <div class="consent-icon">&#128276;</div>
-      <h2 class="title-lg">Daily Reminders</h2>
-      <p class="subtitle">In a future version, we'll be able to send you daily UV alerts and appointment reminders. For now, bookmark this app and check back each morning for your daily skin safety update.</p>
+      <h2 class="title-lg">Stay Sun Safe Daily</h2>
+      <p class="subtitle">Bookmark this app and check in each morning for your daily UV index and personalised sun safety advice. Push notification reminders are coming in a future update.</p>
       <div class="card" style="margin-top:24px;text-align:center;padding:28px">
         <div style="font-size:40px;margin-bottom:12px">&#128278;</div>
         <div style="font-size:15px;font-weight:600;color:var(--tmc-navy);margin-bottom:6px">Bookmark this app</div>
@@ -1064,7 +1073,7 @@ function renderConsentNotifications(){
       </div>
       <div class="consent-info-box" style="margin-top:16px">&#128293; Push notifications will be available in v0.3. Check back soon.</div>
     </div>
-    <div class="bottom-action"><button class="btn-primary" onclick="finishOnboarding()">Build My Profile &#8594;</button></div>
+    <div class="bottom-action"><button class="btn-primary" onclick="finishOnboarding()">Got it &#8594;</button></div>
     ${renderFooter()}
   </div>`;
 }function renderLoading(){
@@ -1092,6 +1101,11 @@ function renderConsentNotifications(){
   </div>`;
 }
 // ===== HOMEPAGE HELPERS =====
+function getDefaultSPFRec(monkTone){
+  if(monkTone<=3)return'We recommend <strong>SPF 50+</strong> as your daily minimum given your skin type.';
+  if(monkTone<=6)return'We recommend <strong>SPF 30–50</strong> as your daily minimum.';
+  return'Apply <strong>SPF 30+</strong> daily — melanoma risk is equal across all skin tones regardless of natural pigmentation.';
+}
 function buildUVCardHtml(wd,p,hour){
   const isPeak=hour>=11&&hour<=15;
   if(wd&&wd.uv!=null){
@@ -1106,12 +1120,17 @@ function buildUVCardHtml(wd,p,hour){
     </div>`;
   }
   if(!p.consentLocation){
+    const defSPF=getDefaultSPFRec(p.skinType);
+    if(p.postcode){
+      return`<div id="hp-uv-loading" class="uv-loading-state"><div class="uv-loading-spinner"></div><div style="font-size:13px;color:var(--tmc-gray-400)">Fetching UV data for your area…</div><div class="uv-spf-rec" style="margin-top:12px">${defSPF}</div></div>
+      <div id="hp-uv-data" style="display:none"></div>`;
+    }
     return`<div id="hp-uv-loading" style="display:none"></div><div id="hp-uv-data"><div class="uv-unavailable">
       <div class="uv-unavailable-icon">&#128205;</div><div style="font-size:14px;font-weight:600;color:var(--tmc-navy)">Location not enabled</div>
       <div style="margin-top:4px;font-size:12px">Enable location permission in your browser to see live UV data for your area.</div>
-    </div></div>`;
+    </div><div class="uv-spf-rec" style="margin-top:12px">${defSPF}</div></div>`;
   }
-  return`<div id="hp-uv-loading" class="uv-loading-state"><div class="uv-loading-spinner"></div><div style="font-size:13px;color:var(--tmc-gray-400)">Fetching UV data…</div></div>
+  return`<div id="hp-uv-loading" class="uv-loading-state"><div class="uv-loading-spinner"></div><div style="font-size:13px;color:var(--tmc-gray-400)">Fetching UV data…</div><div class="uv-spf-rec" style="margin-top:12px">${getDefaultSPFRec(p.skinType)}</div></div>
   <div id="hp-uv-data" style="display:none">
     <div class="uv-gauge-wrap" id="hp-uv-gauge"></div>
     <div class="uv-value-row"><div class="uv-value" id="hp-uv-value">—</div><div class="uv-value-label">UV Index</div></div>
@@ -1270,33 +1289,56 @@ function updateWeatherUI(wd,geo){
 }
 async function initHomepageAsync(){
   const p=st.profile;if(!p)return;
-  // Try live GPS first if location consent given
   if(p.consentLocation){
-    try{
-      const pos=await getCurrentPosition();
-      const{latitude:lat,longitude:lon}=pos.coords;
-      const geo=await reverseGeocode(lat,lon);
-      // Log for travel detection
-      if(p.consentTravel&&geo.country){
-        logLocationEntry(lat,lon,geo.country);
-        const ts=checkTravelStatus(p);
-        if(ts.justReturned&&shouldShowTravelBanner()){
-          st.showTravelBanner=true;
-          const up={...p,awayFromHome:false};saveProfile(up);st.profile=up;
-          const banner=document.querySelector('.travel-banner');
-          if(!banner){render();return;}
-        }else if(ts.isAway&&!p.awayFromHome){
-          const up={...p,awayFromHome:true};saveProfile(up);st.profile=up;
+    // Re-call GPS only when location is stale (>4h) or not yet captured
+    const stale=!p.lat||!p.lon||!p.locationTimestamp||(Date.now()-p.locationTimestamp)>(4*60*60*1000);
+    if(stale){
+      try{
+        const pos=await getCurrentPosition();
+        const{latitude:lat,longitude:lon}=pos.coords;
+        const geo=await reverseGeocode(lat,lon);
+        // Save refreshed location to profile
+        const up={...st.profile,lat,lon,locationTimestamp:Date.now(),city:geo.city||st.profile.city,country:geo.country||st.profile.country,homeCountry:st.profile.homeCountry||geo.country};
+        saveProfile(up);st.profile=up;
+        // Travel detection
+        if(up.consentTravel&&geo.country){
+          logLocationEntry(lat,lon,geo.country);
+          const ts=checkTravelStatus(up);
+          if(ts.justReturned&&shouldShowTravelBanner()){
+            st.showTravelBanner=true;
+            const up2={...up,awayFromHome:false};saveProfile(up2);st.profile=up2;
+            const banner=document.querySelector('.travel-banner');
+            if(!banner){render();return;}
+          }else if(ts.isAway&&!up.awayFromHome){
+            const up2={...up,awayFromHome:true};saveProfile(up2);st.profile=up2;
+          }
         }
-      }
-      const wd=await fetchWeatherAndUV(lat,lon);
-      if(wd)updateWeatherUI(wd,geo);
+        const wd=await fetchWeatherAndUV(lat,lon);
+        if(wd)updateWeatherUI(wd,geo);
+        return;
+      }catch(e){}
+    }
+    // Not stale — use saved coordinates for UV
+    if(p.lat&&p.lon){
+      try{const wd=await fetchWeatherAndUV(p.lat,p.lon);if(wd)updateWeatherUI(wd,{city:p.city});}catch(e){}
       return;
-    }catch(e){}
+    }
   }
-  // Fallback: use saved lat/lon from onboarding
+  // Fallback 1: saved lat/lon from profile
   if(p.lat&&p.lon){
     try{const wd=await fetchWeatherAndUV(p.lat,p.lon);if(wd)updateWeatherUI(wd,{city:p.city});}catch(e){}
+    return;
+  }
+  // Fallback 2: postcode lookup via postcodes.io (free, keyless UK API)
+  if(p.postcode){
+    const coords=await fetchCoordinatesFromPostcode(p.postcode);
+    if(coords){
+      try{
+        const wd=await fetchWeatherAndUV(coords.lat,coords.lon);
+        if(wd){updateWeatherUI(wd,{city:`Based on your postcode (${p.postcode.toUpperCase()})`});return;}
+      }catch(e){}
+    }
+    showPostcodeUVError(p);
   }
 }
 // ===== PROFILE MANAGEMENT =====
@@ -1327,6 +1369,20 @@ function startLoadingMessages(){
 }
 function removePhoto(region){delete st.bodyPhotos[region];render();}
 function dismissTravelBanner(){setTravelDismissed();st.showTravelBanner=false;const b=document.querySelector('.travel-banner');if(b)b.remove();}
+function showPostcodeUVError(p){
+  const loadEl=document.getElementById('hp-uv-loading'),dataEl=document.getElementById('hp-uv-data');
+  if(loadEl)loadEl.style.display='none';
+  if(dataEl){dataEl.style.display='block';dataEl.innerHTML=`<div class="uv-unavailable"><div class="uv-unavailable-icon">&#9888;&#65039;</div><div style="font-size:14px;font-weight:600;color:var(--tmc-navy)">UV data unavailable</div><div style="margin-top:4px;font-size:12px">Enable location or check postcodes.io is available.</div><button class="btn-secondary" style="margin-top:12px;font-size:13px;padding:10px" onclick="retryPostcodeUV()">Retry &#8634;</button></div><div class="uv-spf-rec" style="margin-top:12px">${getDefaultSPFRec(p.skinType)}</div>`;}
+}
+async function retryPostcodeUV(){
+  const p=st.profile;if(!p||!p.postcode)return;
+  const loadEl=document.getElementById('hp-uv-loading'),dataEl=document.getElementById('hp-uv-data');
+  if(loadEl){loadEl.style.display='block';loadEl.className='uv-loading-state';loadEl.innerHTML=`<div class="uv-loading-spinner"></div><div style="font-size:13px;color:var(--tmc-gray-400)">Retrying…</div><div class="uv-spf-rec" style="margin-top:12px">${getDefaultSPFRec(p.skinType)}</div>`;}
+  if(dataEl)dataEl.style.display='none';
+  const coords=await fetchCoordinatesFromPostcode(p.postcode);
+  if(coords){try{const wd=await fetchWeatherAndUV(coords.lat,coords.lon);if(wd){updateWeatherUI(wd,{city:`Based on your postcode (${p.postcode.toUpperCase()})`});return;}}catch(e){}}
+  showPostcodeUVError(p);
+}
 function resetProfile(){if(confirm('This will clear your profile and restart the questionnaire. Are you sure?')){clearProfile();st.profile=null;st.screen='welcome';st.history=['welcome'];st.weatherData=null;st.currentCity='';render();}}
 function afterLocationConsent(){if(st.consentLocation)navigate('consent_travel');else navigate('consent_notifications');}
 function shareApp(m){
